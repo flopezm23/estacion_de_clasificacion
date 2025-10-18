@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import PowerBIDashboard from "./PowerBIDashboard";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("stats");
+  const [activeTab, setActiveTab] = useState("stats"); // ← Por defecto muestra estadísticas
 
   return (
     <div className="dashboard">
       <h2>Dashboard de Monitoreo</h2>
-      <p>Análisis completo de datos de clasificación</p>
+      <p>Sistema de clasificación de residuos - Datos en tiempo real</p>
 
       {/* Pestañas de navegación */}
       <div className="dashboard-tabs">
@@ -15,17 +15,17 @@ const Dashboard = () => {
           className={activeTab === "stats" ? "active" : ""}
           onClick={() => setActiveTab("stats")}
         >
-          <i className="fas fa-chart-bar"></i> Estadísticas
+          <i className="fas fa-chart-bar"></i> Estadísticas Básicas
         </button>
         <button
           className={activeTab === "powerbi" ? "active" : ""}
           onClick={() => setActiveTab("powerbi")}
         >
-          <i className="fas fa-chart-line"></i> Power BI
+          <i className="fas fa-chart-line"></i> Power BI Avanzado
         </button>
       </div>
 
-      {/* Contenido de pestañas */}
+      {/* Contenido de las pestañas */}
       <div className="tab-content">
         {activeTab === "stats" && <StatsDashboard />}
         {activeTab === "powerbi" && <PowerBIDashboard />}
@@ -34,13 +34,14 @@ const Dashboard = () => {
   );
 };
 
-// Componente de estadísticas (tu dashboard actual)
+// Tu dashboard de estadísticas actual
 const StatsDashboard = () => {
-  // ... tu código actual del dashboard ...
+  // ... tu código existente del dashboard con Supabase ...
   return (
     <div>
       <h3>Estadísticas en Tiempo Real</h3>
-      {/* Tu contenido actual del dashboard */}
+      <p>Datos directos desde la base de datos Supabase</p>
+      {/* Tu contenido actual aquí */}
     </div>
   );
 };
