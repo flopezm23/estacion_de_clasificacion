@@ -3,17 +3,18 @@ import "./App.css";
 import Welcome from "./components/Welcome";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Dashboard from "./components/Dashboard";
-import DataTable from "./components/DataTable";
+import Dashboard from "./components/Dashboard"; // 📊 Reportes generales
+import DataTable from "./components/DataTable"; // 📋 Tabla de datos
+import PowerBIDashboard from "./components/PowerBIDashboard"; // 🚀 Nueva página separada
 
 function App() {
-  const [currentView, setCurrentView] = useState("login");
+  const [currentView, setCurrentView] = useState("welcome");
   const [isRegistering, setIsRegistering] = useState(false);
   const [user, setUser] = useState(null);
 
   const handleLogin = (email) => {
     setUser({ email });
-    setCurrentView("dashboard");
+    setCurrentView("dashboard"); // Por defecto va a Reportes
   };
 
   const handleRegister = (email) => {
@@ -43,7 +44,10 @@ function App() {
         return (
           <Login
             onLogin={handleLogin}
-            onSwitchToRegister={() => setIsRegistering(true)}
+            onSwitchToRegister={() => {
+              setIsRegistering(true);
+              setCurrentView("register");
+            }}
             onBackToWelcome={handleBackToWelcome}
           />
         );
@@ -52,19 +56,25 @@ function App() {
         return (
           <Register
             onRegister={handleRegister}
-            onSwitchToLogin={() => setIsRegistering(false)}
+            onSwitchToLogin={() => {
+              setIsRegistering(false);
+              setCurrentView("login");
+            }}
             onBackToWelcome={handleBackToWelcome}
           />
         );
 
       case "dashboard":
-        return <Dashboard />;
+        return <Dashboard />; // 📊 Reportes generales
+
+      case "powerbi":
+        return <PowerBIDashboard />; // 🚀 Página exclusiva de Power BI
 
       case "data":
-        return <DataTable />;
+        return <DataTable />; // 📋 Tabla de datos
 
       default:
-        return <Welcome onStart={handleStart} />;
+        return <Dashboard />;
     }
   };
 
@@ -73,7 +83,7 @@ function App() {
       <header className="App-header">
         <div className="logo">
           <i className="fas fa-recycle"></i>
-          <span>Estación clasificatoria</span>
+          <span>Estación de Clasificación</span>
         </div>
         {user && (
           <nav>
@@ -81,7 +91,13 @@ function App() {
               className={currentView === "dashboard" ? "active" : ""}
               onClick={() => setCurrentView("dashboard")}
             >
-              <i className="fas fa-chart-bar"></i> Dashboard
+              <i className="fas fa-chart-bar"></i> Reportes
+            </button>
+            <button
+              className={currentView === "powerbi" ? "active" : ""}
+              onClick={() => setCurrentView("powerbi")}
+            >
+              <i className="fas fa-chart-line"></i> Power BI
             </button>
             <button
               className={currentView === "data" ? "active" : ""}
@@ -100,7 +116,7 @@ function App() {
 
       <footer>
         <p>
-          Estación clasificatoria - 2025 |{" "}
+          Sistema de Monitoreo - Tesis 2024 |{" "}
           {user ? `Usuario: ${user.email}` : "No autenticado"}
         </p>
       </footer>

@@ -1,47 +1,179 @@
-import React, { useState } from "react";
-import PowerBIDashboard from "./PowerBIDashboard";
+import React, { useState, useEffect } from "react";
+import { supabase } from "../config/supabase";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("stats"); // ← Por defecto muestra estadísticas
+  const [stats, setStats] = useState({
+    totalRegistros: 0,
+    residuosPorTipo: {},
+    promedioConfianza: 0,
+    ultimaClasificacion: null,
+  });
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      const { data: clasificaciones, error } = await supabase
+        .from("clasificaciones")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      if (clasificaciones && clasificaciones.length > 0) {
+        const totalRegistros = clasificaciones.length;
+
+        const residuosPorTipo = clasificaciones.reduce((acc, item) => {
+          acc[item.tipo_residuo] = (acc[item.tipo_residuo] || 0) + 1;
+          return acc;
+        }, {});
+
+        const promedioConfianza =
+          clasificaciones.reduce((sum, item) => sum + item.confianza, 0) /
+          totalRegistros;
+
+        setStats({
+          totalRegistros,
+          residuosPorTipo,
+          promedioConfianza,
+          ultimaClasificacion: clasificaciones[0],
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Actualización automática cada 30 segundos
+    const interval = setInterval(fetchDashboardData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="dashboard">
+        <div className="loading-container">
+          <i className="fas fa-spinner fa-spin"></i>
+          <p>Cargando reportes...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
-      <h2>Dashboard de Monitoreo</h2>
-      <p>Sistema de clasificación de residuos - Datos en tiempo real</p>
+      <h2>📊 Reportes Generales</h2>
+      <p>Estadísticas en tiempo real del sistema de clasificación</p>
 
-      {/* Pestañas de navegación */}
-      <div className="dashboard-tabs">
-        <button
-          className={activeTab === "stats" ? "active" : ""}
-          onClick={() => setActiveTab("stats")}
-        >
-          <i className="fas fa-chart-bar"></i> Estadísticas Básicas
-        </button>
-        <button
-          className={activeTab === "powerbi" ? "active" : ""}
-          onClick={() => setActiveTab("powerbi")}
-        >
-          <i className="fas fa-chart-line"></i> Power BI Avanzado
-        </button>
+      {/* Estadísticas principales */}
+      <div className="dashboard-stats-main">
+        <div className="stat-card main">
+          <i className="fas fa-database"></i>
+          <div className="stat-content">
+            <h3>{stats.totalRegistros}</h3>
+            <p>Total Clasificaciones</p>
+          </div>
+        </div>
+
+        <div className="stat-card main">
+          <i className="fas fa-chart-line"></i>
+          <div className="stat-content">
+            <h3>{(stats.promedioConfianza * 100).toFixed(1)}%</h3>
+            <p>Confianza Promedio</p>
+          </div>
+        </div>
+
+        <div className="stat-card main">
+          <i className="fas fa-recycle"></i>
+          <div className="stat-content">
+            <h3>{Object.keys(stats.residuosPorTipo).length}</h3>
+            <p>Tipos de Residuos</p>
+          </div>
+        </div>
       </div>
 
-      {/* Contenido de las pestañas */}
-      <div className="tab-content">
-        {activeTab === "stats" && <StatsDashboard />}
-        {activeTab === "powerbi" && <PowerBIDashboard />}
-      </div>
-    </div>
-  );
-};
+      {/* Última clasificación */}
+      {stats.ultimaClasificacion && (
+        <div className="last-classification">
+          <h3>Última Clasificación Registrada</h3>
+          <div className="last-classification-card">
+            <div className="classification-info">
+              <span className="residuo-type">
+                {stats.ultimaClasificacion.tipo_residuo}
+              </span>
+              <span className="confidence">
+                {(stats.ultimaClasificacion.confianza * 100).toFixed(1)}% de
+                confianza
+              </span>
+            </div>
+            <div className="classification-details">
+              <div className="detail">
+                <i className="fas fa-calendar"></i>
+                <span>
+                  {stats.ultimaClasificacion.fecha}{" "}
+                  {stats.ultimaClasificacion.hora}
+                </span>
+              </div>
+              <div className="detail">
+                <i className="fas fa-tint"></i>
+                <span>Humedad: {stats.ultimaClasificacion.humedad}%</span>
+              </div>
+              <div className="detail">
+                <i className="fas fa-smog"></i>
+                <span>Humo: {stats.ultimaClasificacion.humo_ppm} ppm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-// Tu dashboard de estadísticas actual
-const StatsDashboard = () => {
-  // ... tu código existente del dashboard con Supabase ...
-  return (
-    <div>
-      <h3>Estadísticas en Tiempo Real</h3>
-      <p>Datos directos desde la base de datos Supabase</p>
-      {/* Tu contenido actual aquí */}
+      {/* Distribución por tipo de residuo */}
+      <div className="distribution-section">
+        <h3>Distribución por Tipo de Residuo</h3>
+        <div className="distribution-cards">
+          {Object.entries(stats.residuosPorTipo).map(([tipo, cantidad]) => (
+            <div key={tipo} className="distribution-card">
+              <span className="tipo-name">{tipo}</span>
+              <span className="tipo-count">{cantidad}</span>
+              <div className="tipo-bar">
+                <div
+                  className="tipo-fill"
+                  style={{
+                    width: `${(cantidad / stats.totalRegistros) * 100}%`,
+                  }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Acceso rápido a Power BI */}
+      <div className="quick-access">
+        <h3>📈 ¿Necesitas análisis más avanzados?</h3>
+        <div className="quick-access-card">
+          <i className="fas fa-rocket"></i>
+          <div className="quick-access-content">
+            <h4>Dashboard Power BI Completo</h4>
+            <p>
+              Accede a visualizaciones interactivas, filtros avanzados y
+              análisis detallados
+            </p>
+            <button
+              className="quick-access-btn"
+              onClick={() => (window.location.hash = "#/powerbi")} // O tu sistema de navegación
+            >
+              <i className="fas fa-external-link-alt"></i> Ir a Power BI
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
