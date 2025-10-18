@@ -1,0 +1,55 @@
+.powerbi-container {
+  padding: 20px;
+}
+
+.powerbi-frame-container {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 20px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.powerbi-info {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #4e54c8;
+  margin-top: 20px;
+}
+
+.powerbi-info h4 {
+  color: #4e54c8;
+  margin-bottom: 15px;
+}
+
+.powerbi-info ul {
+  list-style: none;
+  padding: 0;
+}
+
+.powerbi-info li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  align-items: center;
+}
+
+.powerbi-info li:before {
+  content: "✓";
+  color: #28a745;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .powerbi-frame-container {
+    padding: 5px;
+  }
+
+  .powerbi-container iframe {
+    height: 400px;
+  }
+}
