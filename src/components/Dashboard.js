@@ -165,13 +165,13 @@ const Dashboard = () => {
           <i className="fas fa-rocket"></i>
           <div className="quick-access-content">
             <h4>Dashboard Power BI Completo</h4>
-            <p color="white">
+            <p className="Dashboard_texto">
               Accede a visualizaciones interactivas, filtros avanzados y
               análisis detallados
             </p>
             <button
               className="quick-access-btn"
-              onClick={() => (window.location.hash = "#/powerbi")} // O tu sistema de navegación
+              onClick={() => (window.location.hash = "#/powerbi)")} // O tu sistema de navegación
             >
               <i className="fas fa-external-link-alt"></i> Ir a Power BI
             </button>

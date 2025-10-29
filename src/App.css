@@ -768,6 +768,9 @@ footer {
   color: #4e54c8;
 }
 
+.Dashboard_texto {
+  color: #e4e7e9;
+}
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-stats-main {
