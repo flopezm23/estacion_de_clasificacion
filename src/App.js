@@ -8,6 +8,7 @@ import DataTable from "./components/DataTable"; // 📋 Tabla de datos
 import PowerBIDashboard from "./components/PowerBIDashboard"; // 🚀 Nueva página separada
 import ReciclajeInfo from "./components/ReciclajeInfo";
 import EstacionClasificadora from "./components/EstacionClasificadora";
+import AdminUsuarios from "./components/AdminUsuarios";
 
 function App() {
   const [currentView, setCurrentView] = useState("welcome");
@@ -83,6 +84,8 @@ function App() {
 
       default:
         return <Dashboard />;
+      case "admin":
+        return <AdminUsuarios />;
     }
   };
 
@@ -113,9 +116,6 @@ function App() {
             >
               <i className="fas fa-database"></i> Datos
             </button>
-            <button onClick={handleLogout} className="logout-btn">
-              <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </button>
 
             <button
               className={currentView === "reciclaje" ? "active" : ""}
@@ -133,6 +133,15 @@ function App() {
               <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
             </button>
           </nav>
+        )}
+
+        {user && user.email === "admin@tesis.com" && (
+          <button
+            className={currentView === "admin" ? "active" : ""}
+            onClick={() => setCurrentView("admin")}
+          >
+            <i className="fas fa-users-cog"></i> Admin
+          </button>
         )}
       </header>
 

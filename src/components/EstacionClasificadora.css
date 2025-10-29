@@ -182,3 +182,140 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Agregar al final del archivo existente */
+
+.loading-metricas {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.loading-metricas i {
+  font-size: 36px;
+  margin-bottom: 15px;
+  color: #2196f3;
+}
+
+.metrica-card.real {
+  border: 2px solid #4caf50;
+  background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+}
+
+.metrica-source {
+  font-size: 0.8em;
+  color: #666;
+  font-style: italic;
+  margin-top: 10px;
+  display: block;
+}
+
+.ultima-clasificacion {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 25px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #4caf50;
+}
+
+.ultima-clasificacion h4 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.clasificacion-info {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.material-badge {
+  background: #2196f3;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.confianza {
+  background: #4caf50;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9em;
+}
+
+.fecha {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.datos-en-vivo {
+  text-align: center;
+  margin-top: 50px;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.datos-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #2196f3 0%, #21cbf3 100%);
+  color: white;
+}
+
+.action-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+}
+
+.action-btn.secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.action-btn.secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .clasificacion-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .datos-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-btn {
+    width: 100%;
+    max-width: 250px;
+    justify-content: center;
+  }
+}

@@ -2,51 +2,66 @@ import React, { useState } from "react";
 import { supabase } from "../config/supabase";
 
 const Register = ({ onRegister, onSwitchToLogin, onBackToWelcome }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [nombre, setNombre] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    nombre: "",
+  });
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
     setLoading(true);
 
     try {
-      // 1. Registrar usuario en Auth de Supabase
+      // Registrar usuario en Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email,
-        password: password,
+        email: formData.email,
+        password: formData.password,
       });
 
       if (authError) throw authError;
 
-      // 2. Guardar en tabla usuarios
       if (authData.user) {
+        // Guardar en tabla usuarios
         const { error: dbError } = await supabase.from("usuarios").insert([
           {
-            email: email,
-            nombre: nombre || email.split("@")[0],
+            email: formData.email,
+            nombre: formData.nombre || formData.email.split("@")[0],
             tipo_usuario: "usuario_registrado",
           },
         ]);
 
         if (dbError) {
-          console.error("Error guardando usuario:", dbError);
+          console.warn("Error guardando en tabla usuarios:", dbError);
           // Continuamos aunque falle el registro en la tabla
         }
 
-        alert("¡Registro exitoso! Ya puedes iniciar sesión.");
-        onRegister(email);
+        alert("¡Registro exitoso! Revisa tu email para confirmar la cuenta.");
+        onRegister(formData.email);
       }
     } catch (error) {
       alert("Error en el registro: " + error.message);
+      console.error("Error completo:", error);
     } finally {
       setLoading(false);
     }
@@ -65,8 +80,9 @@ const Register = ({ onRegister, onSwitchToLogin, onBackToWelcome }) => {
             <label>Nombre completo</label>
             <input
               type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange}
               placeholder="Tu nombre completo"
             />
           </div>
@@ -74,34 +90,44 @@ const Register = ({ onRegister, onSwitchToLogin, onBackToWelcome }) => {
             <label>Correo electrónico</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               required
               placeholder="tu.email@ejemplo.com"
             />
           </div>
           <div className="form-group">
-            <label>Contraseña</label>
+            <label>Contraseña (mínimo 6 caracteres)</label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               required
-              placeholder="Crea una contraseña segura"
+              minLength="6"
+              placeholder="Mínimo 6 caracteres"
             />
           </div>
           <div className="form-group">
             <label>Confirmar Contraseña</label>
             <input
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
               required
               placeholder="Repite tu contraseña"
             />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Registrando..." : "Registrarse"}
+            {loading ? (
+              <>
+                <i className="fas fa-spinner fa-spin"></i> Registrando...
+              </>
+            ) : (
+              "Registrarse"
+            )}
           </button>
         </form>
 

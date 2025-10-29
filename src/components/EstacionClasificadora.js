@@ -1,7 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "../config/supabase";
 import "./EstacionClasificadora.css";
 
 const EstacionClasificadora = () => {
+  const [metricasReales, setMetricasReales] = useState({
+    totalClasificaciones: 0,
+    precisionPromedio: 0,
+    materialesIdentificados: 0,
+    ultimaClasificacion: null,
+  });
+  const [loading, setLoading] = useState(true);
+
+  const cargarMetricasReales = async () => {
+    try {
+      const { data: clasificaciones, error } = await supabase
+        .from("clasificaciones")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      if (clasificaciones && clasificaciones.length > 0) {
+        const total = clasificaciones.length;
+        const precisionPromedio =
+          clasificaciones.reduce((sum, item) => sum + item.confianza, 0) /
+          total;
+        const materialesUnicos = new Set(
+          clasificaciones.map((item) => item.tipo_residuo)
+        ).size;
+
+        setMetricasReales({
+          totalClasificaciones: total,
+          precisionPromedio: precisionPromedio * 100, // Convertir a porcentaje
+          materialesIdentificados: materialesUnicos,
+          ultimaClasificacion: clasificaciones[0],
+        });
+      }
+    } catch (err) {
+      console.error("Error cargando métricas:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarMetricasReales();
+  }, []);
+
   const caracteristicas = [
     {
       icono: "fas fa-robot",
@@ -126,24 +171,76 @@ const EstacionClasificadora = () => {
       </section>
 
       <section className="metricas-section">
-        <h2>📊 Métricas del Sistema</h2>
-        <div className="metricas-grid">
-          <div className="metrica-card">
-            <h4>95%</h4>
-            <p>Precisión en clasificación</p>
+        <h2>📊 Métricas del Sistema - Datos en Tiempo Real</h2>
+        {loading ? (
+          <div className="loading-metricas">
+            <i className="fas fa-spinner fa-spin"></i>
+            <p>Cargando métricas actuales...</p>
           </div>
-          <div className="metrica-card">
-            <h4>Menor a 2s</h4>
-            <p>Tiempo de procesamiento</p>
-          </div>
-          <div className="metrica-card">
-            <h4>5</h4>
-            <p>Materiales identificados</p>
-          </div>
-          <div className="metrica-card">
-            <h4>24/7</h4>
-            <p>Operación continua</p>
-          </div>
+        ) : (
+          <>
+            <div className="metricas-grid">
+              <div className="metrica-card real">
+                <h4>{metricasReales.totalClasificaciones}</h4>
+                <p>Total Clasificaciones</p>
+                <span className="metrica-source">📊 Datos reales</span>
+              </div>
+              <div className="metrica-card real">
+                <h4>{metricasReales.precisionPromedio.toFixed(1)}%</h4>
+                <p>Precisión Promedio</p>
+                <span className="metrica-source">📊 Datos reales</span>
+              </div>
+              <div className="metrica-card real">
+                <h4>{metricasReales.materialesIdentificados}</h4>
+                <p>Materiales Identificados</p>
+                <span className="metrica-source">📊 Datos reales</span>
+              </div>
+              <div className="metrica-card">
+                <h4>24/7</h4>
+                <p>Operación continua</p>
+                <span className="metrica-source">⚡ Sistema</span>
+              </div>
+            </div>
+
+            {metricasReales.ultimaClasificacion && (
+              <div className="ultima-clasificacion">
+                <h4>Última Clasificación Registrada</h4>
+                <div className="clasificacion-info">
+                  <span className="material-badge">
+                    {metricasReales.ultimaClasificacion.tipo_residuo}
+                  </span>
+                  <span className="confianza">
+                    {(
+                      metricasReales.ultimaClasificacion.confianza * 100
+                    ).toFixed(1)}
+                    % de confianza
+                  </span>
+                  <span className="fecha">
+                    {metricasReales.ultimaClasificacion.fecha}{" "}
+                    {metricasReales.ultimaClasificacion.hora}
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      <section className="datos-en-vivo">
+        <h2>📈 ¿Quieres ver todos los datos?</h2>
+        <div className="datos-actions">
+          <button
+            className="action-btn primary"
+            onClick={() => (window.location.hash = "#/dashboard")}
+          >
+            <i className="fas fa-chart-bar"></i> Ver Reportes Completos
+          </button>
+          <button
+            className="action-btn secondary"
+            onClick={() => (window.location.hash = "#/data")}
+          >
+            <i className="fas fa-database"></i> Explorar Datos en Tabla
+          </button>
         </div>
       </section>
     </div>
