@@ -142,3 +142,143 @@
     padding: 10px 8px;
   }
 }
+/* Agregar estos estilos al archivo existente */
+
+.admin-stats {
+  display: flex;
+  gap: 15px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.admin-stats span {
+  background: #f8f9fa;
+  padding: 5px 10px;
+  border-radius: 15px;
+  border: 1px solid #e9ecef;
+}
+
+.role-select {
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
+.role-select:focus {
+  outline: none;
+  border-color: #4e54c8;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 5px;
+}
+
+.status-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.3s ease;
+}
+
+.status-btn.activate {
+  background: #28a745;
+  color: white;
+}
+
+.status-btn.activate:hover {
+  background: #218838;
+}
+
+.status-btn.deactivate {
+  background: #dc3545;
+  color: white;
+}
+
+.status-btn.deactivate:hover {
+  background: #c82333;
+}
+
+.inactive-user {
+  background-color: #f8f9fa;
+  opacity: 0.7;
+}
+
+.inactive-user:hover {
+  opacity: 1;
+}
+
+.admin-notes {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #4e54c8;
+}
+
+.admin-notes h4 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.admin-notes ul {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-notes li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+  color: #666;
+}
+
+.admin-notes li:last-child {
+  border-bottom: none;
+}
+
+.access-denied {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.access-denied i {
+  font-size: 64px;
+  color: #dc3545;
+  margin-bottom: 20px;
+}
+
+.access-denied h2 {
+  color: #dc3545;
+  margin-bottom: 15px;
+}
+
+.access-denied button {
+  background: #4e54c8;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.auth-error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c6cb;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-error i {
+  font-size: 16px;
+}

@@ -1,32 +1,72 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Welcome from "./components/Welcome";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Dashboard from "./components/Dashboard"; // 📊 Reportes generales
-import DataTable from "./components/DataTable"; // 📋 Tabla de datos
-import PowerBIDashboard from "./components/PowerBIDashboard"; // 🚀 Nueva página separada
+import Dashboard from "./components/Dashboard";
+import DataTable from "./components/DataTable";
+import PowerBIDashboard from "./components/PowerBIDashboard";
 import ReciclajeInfo from "./components/ReciclajeInfo";
 import EstacionClasificadora from "./components/EstacionClasificadora";
 import AdminUsuarios from "./components/AdminUsuarios";
+import { supabase } from "./config/supabase";
 
 function App() {
   const [currentView, setCurrentView] = useState("welcome");
   const [isRegistering, setIsRegistering] = useState(false);
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
 
-  const handleLogin = (email) => {
-    setUser({ email });
-    setCurrentView("dashboard"); // Por defecto va a Reportes
+  // Función para cargar el perfil del usuario desde la tabla usuarios
+  const loadUserProfile = async (email) => {
+    try {
+      const { data, error } = await supabase
+        .from("usuarios")
+        .select("*")
+        .eq("email", email)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error loading user profile:", error);
+      return null;
+    }
   };
 
-  const handleRegister = (email) => {
+  // Función para actualizar último acceso
+  const updateLastAccess = async (email) => {
+    try {
+      await supabase
+        .from("usuarios")
+        .update({ ultimo_acceso: new Date().toISOString() })
+        .eq("email", email);
+    } catch (error) {
+      console.error("Error updating last access:", error);
+    }
+  };
+
+  const handleLogin = async (email) => {
+    const profile = await loadUserProfile(email);
     setUser({ email });
+    setUserProfile(profile);
+
+    // Actualizar último acceso
+    await updateLastAccess(email);
+
+    setCurrentView("dashboard");
+  };
+
+  const handleRegister = async (email) => {
+    const profile = await loadUserProfile(email);
+    setUser({ email });
+    setUserProfile(profile);
     setCurrentView("dashboard");
   };
 
   const handleLogout = () => {
     setUser(null);
+    setUserProfile(null);
     setCurrentView("welcome");
   };
 
@@ -36,6 +76,12 @@ function App() {
 
   const handleBackToWelcome = () => {
     setCurrentView("welcome");
+  };
+
+  const isAdmin = () => {
+    return (
+      userProfile?.tipo_usuario === "admin" || user?.email === "admin@tesis.com"
+    );
   };
 
   const renderContent = () => {
@@ -68,13 +114,13 @@ function App() {
         );
 
       case "dashboard":
-        return <Dashboard />; // 📊 Reportes generales
+        return <Dashboard />;
 
       case "powerbi":
-        return <PowerBIDashboard />; // 🚀 Página exclusiva de Power BI
+        return <PowerBIDashboard />;
 
       case "data":
-        return <DataTable />; // 📋 Tabla de datos
+        return <DataTable />;
 
       case "reciclaje":
         return <ReciclajeInfo />;
@@ -82,10 +128,22 @@ function App() {
       case "estacion":
         return <EstacionClasificadora />;
 
+      case "admin":
+        return isAdmin() ? (
+          <AdminUsuarios />
+        ) : (
+          <div className="access-denied">
+            <i className="fas fa-ban"></i>
+            <h2>Acceso Denegado</h2>
+            <p>No tienes permisos de administrador.</p>
+            <button onClick={() => setCurrentView("dashboard")}>
+              Volver al Dashboard
+            </button>
+          </div>
+        );
+
       default:
         return <Dashboard />;
-      case "admin":
-        return <AdminUsuarios />;
     }
   };
 
@@ -116,7 +174,6 @@ function App() {
             >
               <i className="fas fa-database"></i> Datos
             </button>
-
             <button
               className={currentView === "reciclaje" ? "active" : ""}
               onClick={() => setCurrentView("reciclaje")}
@@ -129,19 +186,21 @@ function App() {
             >
               <i className="fas fa-robot"></i> Estación
             </button>
+
+            {/* Botón de Admin - solo para administradores */}
+            {isAdmin() && (
+              <button
+                className={currentView === "admin" ? "active" : ""}
+                onClick={() => setCurrentView("admin")}
+              >
+                <i className="fas fa-users-cog"></i> Admin
+              </button>
+            )}
+
             <button onClick={handleLogout} className="logout-btn">
               <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
             </button>
           </nav>
-        )}
-
-        {user && user.email === "admin@tesis.com" && (
-          <button
-            className={currentView === "admin" ? "active" : ""}
-            onClick={() => setCurrentView("admin")}
-          >
-            <i className="fas fa-users-cog"></i> Admin
-          </button>
         )}
       </header>
 
@@ -150,7 +209,9 @@ function App() {
       <footer>
         <p>
           Sistema de Monitoreo - Tesis 2024 |{" "}
-          {user ? `Usuario: ${user.email}` : "No autenticado"}
+          {user
+            ? `Usuario: ${user.email} ${isAdmin() ? "(Admin)" : ""}`
+            : "No autenticado"}
         </p>
       </footer>
     </div>
