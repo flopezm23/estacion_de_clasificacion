@@ -20,51 +20,75 @@ function App() {
 
   // Verificar sesión al cargar la aplicación
   useEffect(() => {
-    checkUser();
-
-    // Escuchar cambios en la autenticación
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        await handleUserSession(session.user);
-      } else {
-        setUser(null);
-        setUserProfile(null);
+    const checkUserWithTimeout = async () => {
+      // Timeout de 5 segundos como máximo
+      const timeoutId = setTimeout(() => {
+        console.log("⏰ Timeout alcanzado, forzando fin de loading");
+        setLoading(false);
         setCurrentView("welcome");
-      }
-      setLoading(false);
-    });
+      }, 5000);
 
-    return () => subscription.unsubscribe();
+      await checkUser();
+
+      // Limpiar timeout si checkUser termina antes
+      clearTimeout(timeoutId);
+    };
+
+    checkUserWithTimeout();
   }, []);
 
   const checkUser = async () => {
     try {
+      console.log("🔄 Verificando sesión de usuario...");
+
       const {
         data: { session },
+        error,
       } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("❌ Error obteniendo sesión:", error);
+        setLoading(false);
+        return;
+      }
+
+      console.log("📊 Sesión encontrada:", session ? "Sí" : "No");
+
       if (session?.user) {
         await handleUserSession(session.user);
+      } else {
+        // No hay sesión, ir a welcome
+        setUser(null);
+        setUserProfile(null);
+        setCurrentView("welcome");
       }
     } catch (error) {
-      console.error("Error checking user session:", error);
+      console.error("💥 Error en checkUser:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleUserSession = async (userData) => {
-    const profile = await loadUserProfile(userData.email);
-    setUser({ email: userData.email });
-    setUserProfile(profile);
-    setCurrentView("dashboard");
+    try {
+      console.log("👤 Procesando sesión para:", userData.email);
 
-    // Actualizar último acceso
-    await updateLastAccess(userData.email);
+      const profile = await loadUserProfile(userData.email);
+      setUser({ email: userData.email });
+      setUserProfile(profile);
+      setCurrentView("dashboard");
+
+      // Actualizar último acceso
+      await updateLastAccess(userData.email);
+
+      console.log("✅ Sesión establecida correctamente");
+    } catch (error) {
+      console.error("❌ Error en handleUserSession:", error);
+      setCurrentView("welcome");
+    }
   };
 
-  // Función para cargar el perfil del usuario desde la tabla usuarios
+  // Función para cargar el perfil del usuario
   const loadUserProfile = async (email) => {
     try {
       const { data, error } = await supabase
@@ -74,13 +98,14 @@ function App() {
         .single();
 
       if (error) {
-        console.warn("Error loading user profile:", error);
-        // Crear perfil básico si no existe
+        console.warn("⚠️ Usuario no encontrado en tabla, creando perfil...");
         return await createUserProfile(email);
       }
+
+      console.log("📋 Perfil cargado:", data);
       return data;
     } catch (error) {
-      console.error("Error loading user profile:", error);
+      console.error("❌ Error cargando perfil:", error);
       return null;
     }
   };
@@ -100,9 +125,11 @@ function App() {
         .single();
 
       if (error) throw error;
+
+      console.log("✅ Perfil creado:", data);
       return data;
     } catch (error) {
-      console.error("Error creating user profile:", error);
+      console.error("❌ Error creando perfil:", error);
       return null;
     }
   };
@@ -115,29 +142,34 @@ function App() {
         .update({ ultimo_acceso: new Date().toISOString() })
         .eq("email", email);
     } catch (error) {
-      console.error("Error updating last access:", error);
+      console.error("❌ Error actualizando último acceso:", error);
     }
   };
 
   const handleLogin = async (email) => {
-    // La autenticación ya se maneja en onAuthStateChange
+    console.log("🚀 Iniciando sesión para:", email);
     setCurrentView("dashboard");
   };
 
   const handleRegister = async (email) => {
+    console.log("🎉 Registro exitoso para:", email);
     setCurrentView("dashboard");
   };
 
   const handleLogout = async () => {
     try {
+      console.log("👋 Cerrando sesión...");
+
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
       setUser(null);
       setUserProfile(null);
       setCurrentView("welcome");
+
+      console.log("✅ Sesión cerrada correctamente");
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error("❌ Error cerrando sesión:", error);
     }
   };
 
@@ -157,19 +189,31 @@ function App() {
 
   // Función para navegación entre páginas
   const navigateTo = (view) => {
+    console.log("🧭 Navegando a:", view);
     setCurrentView(view);
   };
 
+  // Loading component mejorado
   if (loading) {
     return (
       <div className="app-loading">
-        <i className="fas fa-spinner fa-spin"></i>
-        <p>Cargando aplicación...</p>
+        <div className="loading-content">
+          <i className="fas fa-spinner fa-spin"></i>
+          <h3>Cargando aplicación...</h3>
+          <p>Verificando autenticación</p>
+          <div className="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
       </div>
     );
   }
 
   const renderContent = () => {
+    console.log("🎬 Renderizando vista:", currentView);
+
     switch (currentView) {
       case "welcome":
         return <Welcome onStart={handleStart} />;
@@ -221,14 +265,15 @@ function App() {
             <i className="fas fa-ban"></i>
             <h2>Acceso Denegado</h2>
             <p>No tienes permisos de administrador.</p>
-            <button onClick={() => setCurrentView("dashboard")}>
+            <button onClick={() => navigateTo("dashboard")}>
               Volver al Dashboard
             </button>
           </div>
         );
 
       default:
-        return <Dashboard onNavigate={navigateTo} />;
+        console.warn("⚠️ Vista no reconocida, redirigiendo a welcome");
+        return <Welcome onStart={handleStart} />;
     }
   };
 
@@ -272,7 +317,6 @@ function App() {
               <i className="fas fa-robot"></i> Estación
             </button>
 
-            {/* Botón de Admin - solo para administradores */}
             {isAdmin() && (
               <button
                 className={currentView === "admin" ? "active" : ""}
@@ -293,7 +337,7 @@ function App() {
 
       <footer>
         <p>
-          Sistema de Monitoreo - Estación Clasificatoria |{" "}
+          Sistema de Monitoreo - Tesis 2024 |{" "}
           {user
             ? `Usuario: ${user.email} ${isAdmin() ? "(Admin)" : ""}`
             : "No autenticado"}
