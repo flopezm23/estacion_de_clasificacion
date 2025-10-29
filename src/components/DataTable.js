@@ -172,7 +172,7 @@ const DataTable = () => {
                       {formatTimestamp(item.timestamp)}
                     </span>
                     <span className="timestamp-source">
-                      <i className="fas fa-check-circle"></i> Desde Timestamp
+                      <i className="fas fa-check-circle"></i> Horario Guatemala
                     </span>
                   </div>
                 </td>

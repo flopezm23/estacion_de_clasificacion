@@ -165,7 +165,7 @@ const Dashboard = () => {
           <i className="fas fa-rocket"></i>
           <div className="quick-access-content">
             <h4>Dashboard Power BI Completo</h4>
-            <p>
+            <p color="white">
               Accede a visualizaciones interactivas, filtros avanzados y
               análisis detallados
             </p>
