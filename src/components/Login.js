@@ -14,7 +14,7 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setError(""); // Limpiar error cuando el usuario escriba
+    setError("");
   };
 
   const handleSubmit = async (e) => {
@@ -25,38 +25,64 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
       return;
     }
 
+    // Validación básica de email
+    if (!formData.email.includes("@")) {
+      setError("Por favor, ingresa un email válido");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
-      // Usar autenticación de Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Manejar errores específicos
+        if (error.message.includes("Invalid login credentials")) {
+          throw new Error("Email o contraseña incorrectos");
+        } else if (error.message.includes("Email not confirmed")) {
+          throw new Error(
+            "Por favor, confirma tu email antes de iniciar sesión"
+          );
+        } else {
+          throw error;
+        }
+      }
 
       if (data.user) {
-        // Actualizar último acceso en la tabla usuarios
-        const { error: updateError } = await supabase
-          .from("usuarios")
-          .update({ ultimo_acceso: new Date().toISOString() })
-          .eq("email", formData.email);
-
-        if (updateError) {
-          console.warn("Error actualizando último acceso:", updateError);
-        }
-
-        onLogin(formData.email);
+        console.log("Login exitoso:", data.user.email);
+        onLogin(data.user.email);
       }
     } catch (error) {
       console.error("Error de login:", error);
       setError(
-        "Credenciales incorrectas. Por favor, verifica tu email y contraseña."
+        error.message ||
+          "Error al iniciar sesión. Por favor, intenta nuevamente."
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Función para reset de contraseña (opcional)
+  const handleResetPassword = async () => {
+    if (!formData.email) {
+      setError("Por favor, ingresa tu email para resetear la contraseña");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        formData.email
+      );
+      if (error) throw error;
+      alert("Se ha enviado un enlace para resetear tu contraseña a tu email");
+    } catch (error) {
+      setError("Error al enviar el email de recuperación: " + error.message);
     }
   };
 
@@ -64,7 +90,7 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
     <div className="auth-container">
       <div className="auth-form">
         <button className="back-btn" onClick={onBackToWelcome}>
-          <i className="fas fa-arrow-left"></i> Volver
+          <i className="fas fa-arrow-left"></i> Volver al Inicio
         </button>
 
         <h2>Iniciar Sesión</h2>
@@ -72,7 +98,7 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
         {error && (
           <div className="auth-error">
             <i className="fas fa-exclamation-triangle"></i>
-            {error}
+            <span>{error}</span>
           </div>
         )}
 
@@ -87,6 +113,7 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
               required
               placeholder="tu.email@ejemplo.com"
               disabled={loading}
+              autoComplete="email"
             />
           </div>
           <div className="form-group">
@@ -99,6 +126,7 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
               required
               placeholder="Ingresa tu contraseña"
               disabled={loading}
+              autoComplete="current-password"
             />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
@@ -112,13 +140,23 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
           </button>
         </form>
 
-        <div className="auth-switch">
-          <p>
-            ¿No tienes cuenta?{" "}
-            <button type="button" onClick={onSwitchToRegister}>
-              Regístrate aquí
-            </button>
-          </p>
+        <div className="auth-links">
+          <button
+            type="button"
+            className="link-btn"
+            onClick={handleResetPassword}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+
+          <div className="auth-switch">
+            <p>
+              ¿No tienes cuenta?{" "}
+              <button type="button" onClick={onSwitchToRegister}>
+                Regístrate aquí
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>

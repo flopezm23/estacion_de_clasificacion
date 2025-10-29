@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../config/supabase";
 
-const Dashboard = () => {
+const Dashboard = ({ onNavigate }) => {
   const [stats, setStats] = useState({
     totalRegistros: 0,
     residuosPorTipo: {},
@@ -50,7 +50,6 @@ const Dashboard = () => {
   useEffect(() => {
     fetchDashboardData();
 
-    // Actualización automática cada 30 segundos
     const interval = setInterval(fetchDashboardData, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -158,24 +157,31 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Acceso rápido a Power BI */}
+      {/* Acceso rápido */}
       <div className="quick-access">
-        <h3>📈 ¿Necesitas análisis más avanzados?</h3>
-        <div className="quick-access-card">
-          <i className="fas fa-rocket"></i>
-          <div className="quick-access-content">
-            <h4>Dashboard Power BI Completo</h4>
-            <p className="Dashboard_texto">
-              Accede a visualizaciones interactivas, filtros avanzados y
-              análisis detallados
-            </p>
-            <button
-              className="quick-access-btn"
-              onClick={() => (window.location.hash = "#/powerbi)")} // O tu sistema de navegación
-            >
-              <i className="fas fa-external-link-alt"></i> Ir a Power BI
-            </button>
-          </div>
+        <h3>🚀 Navegación Rápida</h3>
+        <div className="quick-actions">
+          <button
+            className="quick-btn primary"
+            onClick={() => onNavigate("powerbi")}
+          >
+            <i className="fas fa-chart-line"></i>
+            <span>Dashboard Power BI</span>
+          </button>
+          <button
+            className="quick-btn secondary"
+            onClick={() => onNavigate("data")}
+          >
+            <i className="fas fa-database"></i>
+            <span>Ver Todos los Datos</span>
+          </button>
+          <button
+            className="quick-btn secondary"
+            onClick={() => onNavigate("estacion")}
+          >
+            <i className="fas fa-robot"></i>
+            <span>Info Estación</span>
+          </button>
         </div>
       </div>
     </div>

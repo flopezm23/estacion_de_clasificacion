@@ -828,3 +828,80 @@ footer {
   color: #17a2b8;
   margin-right: 5px;
 }
+/* Loading global de la app */
+.app-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.app-loading i {
+  font-size: 48px;
+  color: #4e54c8;
+}
+
+/* Mejoras para auth */
+.auth-links {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #4e54c8;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.link-btn:hover {
+  color: #3a3eb3;
+}
+
+/* Quick actions en dashboard */
+.quick-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.quick-btn.primary {
+  background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+  color: white;
+}
+
+.quick-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(78, 84, 200, 0.3);
+}
+
+.quick-btn.secondary {
+  background: #f8f9fa;
+  color: #495057;
+  border: 2px solid #e9ecef;
+}
+
+.quick-btn.secondary:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}

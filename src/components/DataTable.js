@@ -134,7 +134,7 @@ const DataTable = () => {
           </div>
           <div className="stat-badge">
             <i className="fas fa-clock"></i>
-            <span>Usando Timestamp como fuente de tiempo</span>
+            <span>Horario de Guatemala</span>
           </div>
         </div>
       </div>
@@ -171,9 +171,11 @@ const DataTable = () => {
                     <span className="date-time">
                       {formatTimestamp(item.timestamp)}
                     </span>
+                    {/*
                     <span className="timestamp-source">
                       <i className="fas fa-check-circle"></i> Horario Guatemala
                     </span>
+*/}
                   </div>
                 </td>
                 <td>
