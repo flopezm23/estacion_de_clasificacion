@@ -337,7 +337,7 @@ function App() {
 
       <footer>
         <p>
-          Sistema de Monitoreo - Tesis 2024 |{" "}
+          Sistema de Monitoreo - Estación Clasificatoria - Modelos Predictivos|{" "}
           {user
             ? `Usuario: ${user.email} ${isAdmin() ? "(Admin)" : ""}`
             : "No autenticado"}

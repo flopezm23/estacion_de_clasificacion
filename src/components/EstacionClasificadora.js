@@ -220,7 +220,7 @@ const EstacionClasificadora = () => {
                       metricasReales.ultimaClasificacion.timestamp * 1000
                     ).toLocaleString("es-ES")}
                     <small style={{ color: "#28a745", marginLeft: "8px" }}>
-                      <i className="fas fa-check-circle"></i> Timestamp
+                      <i className="fas fa-check-circle"></i> Horario Guatemala
                     </small>
                   </span>
                 </div>
