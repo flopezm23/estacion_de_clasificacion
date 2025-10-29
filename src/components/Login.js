@@ -25,64 +25,38 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
       return;
     }
 
-    // Validación básica de email
-    if (!formData.email.includes("@")) {
-      setError("Por favor, ingresa un email válido");
-      return;
-    }
-
     setLoading(true);
     setError("");
 
     try {
+      console.log("🔄 Intentando login...");
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
       if (error) {
-        // Manejar errores específicos
-        if (error.message.includes("Invalid login credentials")) {
-          throw new Error("Email o contraseña incorrectos");
-        } else if (error.message.includes("Email not confirmed")) {
-          throw new Error(
-            "Por favor, confirma tu email antes de iniciar sesión"
-          );
-        } else {
-          throw error;
-        }
+        console.error("❌ Error de Supabase:", error);
+        throw error;
       }
 
       if (data.user) {
-        console.log("Login exitoso:", data.user.email);
+        console.log("✅ Login exitoso para:", data.user.email);
         onLogin(data.user.email);
       }
     } catch (error) {
-      console.error("Error de login:", error);
-      setError(
-        error.message ||
-          "Error al iniciar sesión. Por favor, intenta nuevamente."
-      );
+      console.error("💥 Error de login:", error);
+
+      if (error.message.includes("Invalid login credentials")) {
+        setError("Email o contraseña incorrectos");
+      } else if (error.message.includes("Email not confirmed")) {
+        setError("Por favor, confirma tu email antes de iniciar sesión");
+      } else {
+        setError("Error al iniciar sesión: " + error.message);
+      }
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Función para reset de contraseña (opcional)
-  const handleResetPassword = async () => {
-    if (!formData.email) {
-      setError("Por favor, ingresa tu email para resetear la contraseña");
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        formData.email
-      );
-      if (error) throw error;
-      alert("Se ha enviado un enlace para resetear tu contraseña a tu email");
-    } catch (error) {
-      setError("Error al enviar el email de recuperación: " + error.message);
     }
   };
 
@@ -113,7 +87,6 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
               required
               placeholder="tu.email@ejemplo.com"
               disabled={loading}
-              autoComplete="email"
             />
           </div>
           <div className="form-group">
@@ -126,7 +99,6 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
               required
               placeholder="Ingresa tu contraseña"
               disabled={loading}
-              autoComplete="current-password"
             />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
@@ -140,23 +112,13 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
           </button>
         </form>
 
-        <div className="auth-links">
-          <button
-            type="button"
-            className="link-btn"
-            onClick={handleResetPassword}
-          >
-            ¿Olvidaste tu contraseña?
-          </button>
-
-          <div className="auth-switch">
-            <p>
-              ¿No tienes cuenta?{" "}
-              <button type="button" onClick={onSwitchToRegister}>
-                Regístrate aquí
-              </button>
-            </p>
-          </div>
+        <div className="auth-switch">
+          <p>
+            ¿No tienes cuenta?{" "}
+            <button type="button" onClick={onSwitchToRegister}>
+              Regístrate aquí
+            </button>
+          </p>
         </div>
       </div>
     </div>
