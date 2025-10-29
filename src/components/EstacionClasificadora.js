@@ -216,8 +216,12 @@ const EstacionClasificadora = () => {
                     % de confianza
                   </span>
                   <span className="fecha">
-                    {metricasReales.ultimaClasificacion.fecha}{" "}
-                    {metricasReales.ultimaClasificacion.hora}
+                    {new Date(
+                      metricasReales.ultimaClasificacion.timestamp * 1000
+                    ).toLocaleString("es-ES")}
+                    <small style={{ color: "#28a745", marginLeft: "8px" }}>
+                      <i className="fas fa-check-circle"></i> Timestamp
+                    </small>
                   </span>
                 </div>
               </div>

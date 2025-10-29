@@ -792,3 +792,36 @@ footer {
     font-size: 12px;
   }
 }
+/* Estilos para la nueva visualización de timestamp */
+.timestamp-source {
+  font-size: 0.7em;
+  color: #28a745;
+  display: block;
+  margin-top: 2px;
+}
+
+.timestamp-source i {
+  margin-right: 4px;
+}
+
+.date-time {
+  font-weight: 600;
+  color: #495057;
+  display: block;
+}
+
+.datetime-cell {
+  min-width: 180px;
+}
+
+/* Mejoras para la tabla de datos */
+.data-stats .stat-badge:last-child {
+  background: #e8f5e8;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.table-info .fa-info-circle {
+  color: #17a2b8;
+  margin-right: 5px;
+}

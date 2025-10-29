@@ -6,7 +6,6 @@ const DataTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Función para cargar datos desde Supabase
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -26,10 +25,27 @@ const DataTable = () => {
     }
   };
 
-  // Cargar datos al montar el componente
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Función para formatear el timestamp a fecha/hora legible
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return "N/A";
+    try {
+      const date = new Date(timestamp * 1000); // Convertir de segundos a milisegundos
+      return date.toLocaleString("es-ES", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    } catch (e) {
+      return "Fecha inválida";
+    }
+  };
 
   // Función para descargar datos como CSV
   const handleDownloadCSV = () => {
@@ -38,27 +54,24 @@ const DataTable = () => {
       return;
     }
 
+    // Incluir solo las columnas que quieres en el CSV
     const headers = [
       "ID",
-      "Fecha",
-      "Hora",
+      "Fecha/Hora",
       "Tipo Residuo",
       "Estado",
       "Confianza",
       "Humedad",
       "Humo (PPM)",
-      "Timestamp",
     ];
     const csvData = data.map((item) => [
       item.id,
-      item.fecha,
-      item.hora,
+      formatTimestamp(item.timestamp), // Usar timestamp formateado
       item.tipo_residuo,
       item.estado,
       item.confianza,
       item.humedad,
       item.humo_ppm,
-      item.timestamp,
     ]);
 
     const csvContent = [
@@ -66,7 +79,7 @@ const DataTable = () => {
       ...csvData.map((row) => row.join(",")),
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -77,11 +90,6 @@ const DataTable = () => {
     window.URL.revokeObjectURL(url);
 
     alert("Datos descargados exitosamente en formato CSV");
-  };
-
-  // Función para formatear la fecha
-  const formatDateTime = (fecha, hora) => {
-    return `${fecha} ${hora}`;
   };
 
   if (loading) {
@@ -124,6 +132,10 @@ const DataTable = () => {
               {new Set(data.map((item) => item.tipo_residuo)).size}
             </span>
           </div>
+          <div className="stat-badge">
+            <i className="fas fa-clock"></i>
+            <span>Usando Timestamp como fuente de tiempo</span>
+          </div>
         </div>
       </div>
 
@@ -141,13 +153,13 @@ const DataTable = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Fecha y Hora</th>
+              <th>Fecha y Hora</th> {/* Esta columna ahora usa timestamp */}
               <th>Tipo Residuo</th>
               <th>Estado</th>
               <th>Confianza</th>
               <th>Humedad</th>
               <th>Humo (PPM)</th>
-              <th>Timestamp</th>
+              {/* Columna Timestamp original oculta pero disponible para debugging */}
             </tr>
           </thead>
           <tbody>
@@ -156,13 +168,17 @@ const DataTable = () => {
                 <td>{item.id}</td>
                 <td>
                   <div className="datetime-cell">
-                    <span className="date">{item.fecha}</span>
-                    <span className="time">{item.hora}</span>
+                    <span className="date-time">
+                      {formatTimestamp(item.timestamp)}
+                    </span>
+                    <span className="timestamp-source">
+                      <i className="fas fa-check-circle"></i> Desde Timestamp
+                    </span>
                   </div>
                 </td>
                 <td>
                   <span
-                    className={`residuo-badge ${item.tipo_residuo.toLowerCase()}`}
+                    className={`residuo-badge ${item.tipo_residuo?.toLowerCase()}`}
                   >
                     {item.tipo_residuo}
                   </span>
@@ -195,11 +211,6 @@ const DataTable = () => {
                     {item.humo_ppm} ppm
                   </div>
                 </td>
-                <td>
-                  <span className="timestamp">
-                    {new Date(item.timestamp * 1000).toLocaleString()}
-                  </span>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -216,6 +227,11 @@ const DataTable = () => {
 
       <div className="table-info">
         <p>Mostrando {data.length} registros de clasificación</p>
+        <p>
+          <i className="fas fa-info-circle"></i>
+          Las fechas y horas se calculan desde la columna Timestamp para mayor
+          precisión
+        </p>
         <p>Última actualización: {new Date().toLocaleString()}</p>
       </div>
     </div>

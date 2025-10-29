@@ -116,9 +116,13 @@ const Dashboard = () => {
               <div className="detail">
                 <i className="fas fa-calendar"></i>
                 <span>
-                  {stats.ultimaClasificacion.fecha}{" "}
-                  {stats.ultimaClasificacion.hora}
+                  {new Date(
+                    stats.ultimaClasificacion.timestamp * 1000
+                  ).toLocaleString("es-ES")}
                 </span>
+                <small style={{ color: "#28a745", marginLeft: "8px" }}>
+                  <i className="fas fa-check-circle"></i> Timestamp
+                </small>
               </div>
               <div className="detail">
                 <i className="fas fa-tint"></i>
