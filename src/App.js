@@ -6,6 +6,8 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard"; // 📊 Reportes generales
 import DataTable from "./components/DataTable"; // 📋 Tabla de datos
 import PowerBIDashboard from "./components/PowerBIDashboard"; // 🚀 Nueva página separada
+import ReciclajeInfo from "./components/ReciclajeInfo";
+import EstacionClasificadora from "./components/EstacionClasificadora";
 
 function App() {
   const [currentView, setCurrentView] = useState("welcome");
@@ -73,6 +75,12 @@ function App() {
       case "data":
         return <DataTable />; // 📋 Tabla de datos
 
+      case "reciclaje":
+        return <ReciclajeInfo />;
+
+      case "estacion":
+        return <EstacionClasificadora />;
+
       default:
         return <Dashboard />;
     }
@@ -104,6 +112,22 @@ function App() {
               onClick={() => setCurrentView("data")}
             >
               <i className="fas fa-database"></i> Datos
+            </button>
+            <button onClick={handleLogout} className="logout-btn">
+              <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+
+            <button
+              className={currentView === "reciclaje" ? "active" : ""}
+              onClick={() => setCurrentView("reciclaje")}
+            >
+              <i className="fas fa-recycle"></i> Reciclaje
+            </button>
+            <button
+              className={currentView === "estacion" ? "active" : ""}
+              onClick={() => setCurrentView("estacion")}
+            >
+              <i className="fas fa-robot"></i> Estación
             </button>
             <button onClick={handleLogout} className="logout-btn">
               <i className="fas fa-sign-out-alt"></i> Cerrar Sesión

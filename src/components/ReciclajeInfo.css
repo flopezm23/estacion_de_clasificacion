@@ -1,0 +1,157 @@
+.reciclaje-info {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.reciclaje-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.reciclaje-header h1 {
+  color: #4caf50;
+  font-size: 2.5em;
+  margin-bottom: 15px;
+}
+
+.reciclaje-header p {
+  font-size: 1.2em;
+  color: #666;
+}
+
+.materiales-section,
+.beneficios-section,
+.consejos-section {
+  margin-bottom: 60px;
+}
+
+.materiales-section h2,
+.beneficios-section h2,
+.consejos-section h2 {
+  color: #4caf50;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.materiales-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.material-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.material-card:hover {
+  transform: translateY(-5px);
+}
+
+.material-header {
+  padding: 20px;
+  border-bottom: 4px solid;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #f8f9fa;
+}
+
+.material-header i {
+  font-size: 24px;
+}
+
+.material-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.material-content {
+  padding: 20px;
+}
+
+.material-content p {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.beneficios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.beneficio-card {
+  background: white;
+  padding: 30px 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e9ecef;
+}
+
+.beneficio-card i {
+  font-size: 36px;
+  color: #4caf50;
+  margin-bottom: 15px;
+}
+
+.beneficio-card h4 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.beneficio-card p {
+  color: #666;
+  line-height: 1.4;
+}
+
+.consejos-list {
+  display: grid;
+  gap: 20px;
+}
+
+.consejo-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.consejo-item i {
+  font-size: 24px;
+  color: #4caf50;
+  min-width: 40px;
+}
+
+.consejo-item h4 {
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.consejo-item p {
+  color: #666;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .materiales-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .beneficios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .consejo-item {
+    flex-direction: column;
+    text-align: center;
+  }
+}

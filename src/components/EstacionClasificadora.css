@@ -1,0 +1,184 @@
+.estacion-clasificadora {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.estacion-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.estacion-header h1 {
+  color: #2196f3;
+  font-size: 2.5em;
+  margin-bottom: 15px;
+}
+
+.estacion-header p {
+  font-size: 1.2em;
+  color: #666;
+}
+
+.tecnologia-section,
+.proceso-section,
+.modelos-section,
+.metricas-section {
+  margin-bottom: 60px;
+}
+
+.tecnologia-section h2,
+.proceso-section h2,
+.modelos-section h2,
+.metricas-section h2 {
+  color: #2196f3;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.tecnologia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.tecnologia-card {
+  background: white;
+  padding: 30px 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e9ecef;
+  transition: transform 0.3s ease;
+}
+
+.tecnologia-card:hover {
+  transform: translateY(-5px);
+}
+
+.tecnologia-card i {
+  font-size: 48px;
+  color: #2196f3;
+  margin-bottom: 20px;
+}
+
+.tecnologia-card h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.tecnologia-card p {
+  color: #666;
+  line-height: 1.5;
+}
+
+.proceso-timeline {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.proceso-paso {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.paso-numero {
+  background: #2196f3;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.paso-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  flex: 1;
+}
+
+.paso-content h4 {
+  color: #2196f3;
+  margin-bottom: 10px;
+}
+
+.modelos-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.modelo-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid #2196f3;
+}
+
+.modelo-card h3 {
+  color: #2196f3;
+  margin-bottom: 15px;
+}
+
+.modelo-card ul {
+  margin-top: 15px;
+  padding-left: 20px;
+}
+
+.modelo-card li {
+  margin: 8px 0;
+  color: #666;
+}
+
+.metricas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.metrica-card {
+  background: white;
+  padding: 25px 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e9ecef;
+}
+
+.metrica-card h4 {
+  font-size: 2em;
+  color: #2196f3;
+  margin-bottom: 10px;
+}
+
+.metrica-card p {
+  color: #666;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .proceso-paso {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .modelos-info {
+    grid-template-columns: 1fr;
+  }
+
+  .metricas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
