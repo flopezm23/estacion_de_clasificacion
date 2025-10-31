@@ -49,7 +49,7 @@ const Welcome = ({ onStart }) => {
             Más Información
           </button>
         </div>
-
+        {/*Corrigiendo datos*/}
         <div className="welcome-footer">
           <p>Sistema desarrollado para Estación Clasificatoria</p>
         </div>
