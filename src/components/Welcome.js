@@ -44,10 +44,12 @@ const Welcome = ({ onStart }) => {
             <i className="fas fa-rocket"></i>
             Comenzar Ahora
           </button>
+          {/*
           <button className="welcome-btn secondary">
             <i className="fas fa-info-circle"></i>
             Más Información
           </button>
+          */}
         </div>
         {/*Corrigiendo datos*/}
         <div className="welcome-footer">
