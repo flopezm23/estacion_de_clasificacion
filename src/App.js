@@ -310,12 +310,15 @@ function App() {
             >
               <i className="fas fa-recycle"></i> Reciclaje
             </button>
-            <button
-              className={currentView === "estacion" ? "active" : ""}
-              onClick={() => navigateTo("estacion")}
-            >
-              <i className="fas fa-robot"></i> Estación
-            </button>
+
+            {isAdmin() && (
+              <button
+                className={currentView === "estacion" ? "active" : ""}
+                onClick={() => navigateTo("estacion")}
+              >
+                <i className="fas fa-robot"></i> Estación
+              </button>
+            )}
 
             {isAdmin() && (
               <button

@@ -51,7 +51,7 @@ const Welcome = ({ onStart }) => {
         </div>
 
         <div className="welcome-footer">
-          <p>Sistema desarrollado para Proyecto de Graduación 2024</p>
+          <p>Sistema desarrollado para Estación Clasificatoria</p>
         </div>
       </div>
     </div>
