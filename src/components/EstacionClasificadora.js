@@ -10,6 +10,8 @@ const EstacionClasificadora = () => {
     ultimaClasificacion: null,
   });
   const [loading, setLoading] = useState(true);
+  const [imagenesGaleria, setImagenesGaleria] = useState([]);
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
 
   const cargarMetricasReales = async () => {
     try {
@@ -31,7 +33,7 @@ const EstacionClasificadora = () => {
 
         setMetricasReales({
           totalClasificaciones: total,
-          precisionPromedio: precisionPromedio * 100, // Convertir a porcentaje
+          precisionPromedio: precisionPromedio * 100,
           materialesIdentificados: materialesUnicos,
           ultimaClasificacion: clasificaciones[0],
         });
@@ -43,9 +45,68 @@ const EstacionClasificadora = () => {
     }
   };
 
+  const cargarImagenesGaleria = () => {
+    const imagenesReales = [
+      {
+        id: 1,
+        src: "/imagenes/estacion_interior.jpg",
+        alt: "Estación clasificadora",
+        titulo: "Estación clasificadora en interior",
+        descripcion: "Estación clasificadora operando en un entorno controlado",
+      },
+      {
+        id: 2,
+        src: "/imagenes/estacion_uso.jpg",
+        alt: "Estación en funcionamiento",
+        titulo: "Estación en Uso",
+        descripcion: "Uso de la estación por parte de una voluntaria ",
+      },
+      {
+        id: 3,
+        src: "/imagenes/botes.jpg",
+        alt: "Recipientes de clasificación",
+        titulo: "Recipientes para residuos clasificados",
+        descripcion: "Botes etiquetados para diferentes tipos de materiales",
+      },
+      {
+        id: 4,
+        src: "/imagenes/pantalla_lcd.jpg",
+        alt: "Pantalla LCD mostrando estado",
+        titulo: "Pantalla LCD para mejorar la experiencia",
+        descripcion:
+          "El estado y los resultados son presentados también en una pantalla LCD",
+      },
+      {
+        id: 5,
+        src: "/imagenes/sensores.jpg",
+        alt: "Sensores y cámaras implementados",
+        titulo: "Componentes electrónicos",
+        descripcion: "Conjunto de sensores y cámara utilizados en la estación",
+      },
+      {
+        id: 6,
+        src: "/imagenes/hoja_instrucciones.jpg",
+        alt: "Instrucciones de uso",
+        titulo: "Hoja de instrucciones",
+        descripcion: "Instrucciones del funcionamiento básico para el usuario",
+      },
+    ];
+
+    setImagenesGaleria(imagenesReales);
+  };
+
   useEffect(() => {
     cargarMetricasReales();
+    cargarImagenesGaleria();
   }, []);
+
+  const abrirModal = (imagen) => {
+    setImagenSeleccionada(imagen);
+  };
+
+  const cerrarModal = () => {
+    setImagenSeleccionada(null);
+  };
 
   const caracteristicas = [
     {
@@ -247,6 +308,101 @@ const EstacionClasificadora = () => {
           </button>
         </div>
       </section>
+
+      {/* NUEVA SECCIÓN: GALERÍA DE IMÁGENES */}
+      <section className="galeria-section">
+        <h2>🖼️ Galería del Sistema</h2>
+        <p className="galeria-descripcion">
+          Imagenes reales de la estación en funcionamiento y sus componentes.
+        </p>
+
+        <div className="galeria-grid">
+          {imagenesGaleria.map((imagen) => (
+            <div
+              key={imagen.id}
+              className="galeria-item"
+              onClick={() => abrirModal(imagen)}
+            >
+              <div className="galeria-imagen-container">
+                <img
+                  src={imagen.src}
+                  alt={imagen.alt}
+                  className="galeria-imagen"
+                  onError={(e) => {
+                    e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3E${encodeURIComponent(
+                      imagen.titulo
+                    )}%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='12' fill='%23666'%3E${encodeURIComponent(
+                      imagen.tipo
+                    )}%3C/text%3E%3C/svg%3E`;
+                  }}
+                />
+                <div className="galeria-overlay">
+                  <i className="fas fa-search-plus"></i>
+                </div>
+              </div>
+              <div className="galeria-info">
+                <h4>{imagen.titulo}</h4>
+                <p>{imagen.descripcion}</p>
+                {/*
+                <div className="galeria-tags">
+                  <span className="tag tipo">{imagen.tipo}</span>
+                  {imagen.confianza !== "N/A" && (
+                    <span className="tag confianza">{imagen.confianza} confianza</span>
+                  )}
+                </div>
+                */}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="galeria-nota">
+          <p>
+            <i className="fas fa-info-circle"></i>
+            Estas imágenes muestran la estación clasificadora en operación real
+            y sus componentes durante las pruebas.
+          </p>
+        </div>
+      </section>
+
+      {/* MODAL PARA VISUALIZACIÓN DE IMAGEN */}
+      {imagenSeleccionada && (
+        <div className="modal-overlay" onClick={cerrarModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={cerrarModal}>
+              <i className="fas fa-times"></i>
+            </button>
+            <div className="modal-imagen-container">
+              <img
+                src={imagenSeleccionada.src}
+                alt={imagenSeleccionada.alt}
+                className="modal-imagen"
+                onError={(e) => {
+                  e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='%23999'%3E${encodeURIComponent(
+                    imagenSeleccionada.titulo
+                  )}%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23666'%3EImagen no disponible%3C/text%3E%3C/svg%3E`;
+                }}
+              />
+            </div>
+            <div className="modal-info">
+              <h3>{imagenSeleccionada.titulo}</h3>
+              <p>{imagenSeleccionada.descripcion}</p>
+              {/*
+              <div className="modal-details">
+                <div className="detail-item">
+                  <strong>Tipo:</strong> {imagenSeleccionada.tipo}
+                </div>
+                {imagenSeleccionada.confianza !== "N/A" && (
+                  <div className="detail-item">
+                    <strong>Confianza:</strong> {imagenSeleccionada.confianza}
+                  </div>
+                )}
+              </div>
+              */}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
