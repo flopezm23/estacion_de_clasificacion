@@ -49,28 +49,28 @@ const EstacionClasificadora = () => {
     const imagenesReales = [
       {
         id: 1,
-        src: "/imagenes/estacion_interior.jpg",
+        src: "public/imagenes/estacion_interior.jpg",
         alt: "Estación clasificadora",
         titulo: "Estación clasificadora en interior",
         descripcion: "Estación clasificadora operando en un entorno controlado",
       },
       {
         id: 2,
-        src: "/imagenes/estacion_uso.jpg",
+        src: "public/imagenes/estacion_uso.jpg",
         alt: "Estación en funcionamiento",
         titulo: "Estación en Uso",
         descripcion: "Uso de la estación por parte de una voluntaria ",
       },
       {
         id: 3,
-        src: "/imagenes/botes.jpg",
+        src: "public/imagenes/botes.jpg",
         alt: "Recipientes de clasificación",
         titulo: "Recipientes para residuos clasificados",
         descripcion: "Botes etiquetados para diferentes tipos de materiales",
       },
       {
         id: 4,
-        src: "/imagenes/pantalla_lcd.jpg",
+        src: "public/imagenes/pantalla_lcd.jpg",
         alt: "Pantalla LCD mostrando estado",
         titulo: "Pantalla LCD para mejorar la experiencia",
         descripcion:
@@ -78,14 +78,14 @@ const EstacionClasificadora = () => {
       },
       {
         id: 5,
-        src: "/imagenes/sensores.jpg",
+        src: "public/imagenes/sensores.jpg",
         alt: "Sensores y cámaras implementados",
         titulo: "Componentes electrónicos",
         descripcion: "Conjunto de sensores y cámara utilizados en la estación",
       },
       {
         id: 6,
-        src: "/imagenes/hoja_instrucciones.jpg",
+        src: "public/imagenes/hoja_instrucciones.jpg",
         alt: "Instrucciones de uso",
         titulo: "Hoja de instrucciones",
         descripcion: "Instrucciones del funcionamiento básico para el usuario",
