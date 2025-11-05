@@ -1045,3 +1045,43 @@ footer {
 .access-denied button:hover {
   background: #3a3eb3;
 }
+/* Barra de progreso para loading */
+.loading-progress {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4e54c8, #8f94fb);
+  border-radius: 3px;
+  animation: progressAnimation 2s ease-in-out infinite;
+}
+
+@keyframes progressAnimation {
+  0% {
+    width: 0%;
+    transform: translateX(-100%);
+  }
+  50% {
+    width: 100%;
+    transform: translateX(0%);
+  }
+  100% {
+    width: 0%;
+    transform: translateX(100%);
+  }
+}
+
+/* Estado cuando auth ya fue verificada */
+.auth-checked .loading-content {
+  opacity: 0.7;
+}

@@ -17,80 +17,131 @@ function App() {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Efecto principal para verificar autenticación
   useEffect(() => {
-    checkAuthState();
+    let mounted = true;
 
-    // Escuchar cambios de autenticación
+    const initializeAuth = async () => {
+      try {
+        console.log("🔄 Inicializando autenticación...");
+
+        // Timeout de seguridad de 8 segundos
+        const timeoutId = setTimeout(() => {
+          if (mounted) {
+            console.log("⏰ Timeout: Forzando fin de loading");
+            setLoading(false);
+            setAuthChecked(true);
+            setCurrentView("welcome");
+          }
+        }, 8000);
+
+        // Verificar sesión actual
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error("❌ Error obteniendo sesión:", error);
+          throw error;
+        }
+
+        if (session?.user && mounted) {
+          console.log("✅ Sesión encontrada:", session.user.email);
+          await handleUserAuthenticated(session.user);
+        } else if (mounted) {
+          console.log("ℹ️ No hay sesión activa");
+          setUser(null);
+          setUserProfile(null);
+          setCurrentView("welcome");
+        }
+
+        clearTimeout(timeoutId);
+      } catch (error) {
+        console.error("💥 Error en inicialización:", error);
+        if (mounted) {
+          setCurrentView("welcome");
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          setAuthChecked(true);
+        }
+      }
+    };
+
+    initializeAuth();
+
+    // Configurar listener de cambios de auth
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
       console.log("🔐 Evento de auth:", event);
 
-      if (event === "SIGNED_IN" && session) {
-        await handleUserAuthenticated(session.user);
-      } else if (event === "SIGNED_OUT") {
-        handleUserSignedOut();
-      } else if (event === "INITIAL_SESSION" && session) {
-        await handleUserAuthenticated(session.user);
+      switch (event) {
+        case "SIGNED_IN":
+          if (session) {
+            await handleUserAuthenticated(session.user);
+          }
+          break;
+
+        case "SIGNED_OUT":
+          handleUserSignedOut();
+          break;
+
+        case "TOKEN_REFRESHED":
+          console.log("Token refrescado");
+          break;
+
+        case "USER_UPDATED":
+          console.log("Usuario actualizado");
+          break;
+
+        default:
+          console.log("Evento no manejado:", event);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
-
-  const checkAuthState = async () => {
-    try {
-      console.log("🔄 Verificando estado de autenticación...");
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error("❌ Error obteniendo sesión:", error);
-        setLoading(false);
-        return;
-      }
-
-      if (session?.user) {
-        console.log("✅ Usuario autenticado encontrado:", session.user.email);
-        await handleUserAuthenticated(session.user);
-      } else {
-        console.log("ℹ️ No hay usuario autenticado");
-        setUser(null);
-        setUserProfile(null);
-        setCurrentView("welcome");
-      }
-    } catch (error) {
-      console.error("💥 Error en checkAuthState:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleUserAuthenticated = async (userData) => {
     try {
-      console.log("👤 Procesando usuario autenticado:", userData.email);
+      console.log("👤 Autenticando usuario:", userData.email);
 
-      const profile = await loadUserProfile(userData.email);
+      // Primero establecer el usuario básico
       setUser({
         email: userData.email,
         id: userData.id,
       });
-      setUserProfile(profile);
 
-      // Solo cambiar a dashboard si estamos en welcome/login/register
+      // Cargar perfil en segundo plano
+      loadUserProfile(userData.email)
+        .then((profile) => {
+          setUserProfile(profile);
+        })
+        .catch((error) => {
+          console.error("Error cargando perfil:", error);
+        });
+
+      // Actualizar último acceso
+      updateLastAccess(userData.email).catch(console.error);
+
+      // Cambiar vista solo si es necesario
       if (["welcome", "login", "register"].includes(currentView)) {
         setCurrentView("dashboard");
       }
 
-      await updateLastAccess(userData.email);
-
       console.log("✅ Autenticación completada");
     } catch (error) {
-      console.error("❌ Error en handleUserAuthenticated:", error);
+      console.error("❌ Error en autenticación:", error);
     }
   };
 
@@ -112,11 +163,11 @@ function App() {
         .single();
 
       if (error) {
-        console.warn("⚠️ Usuario no encontrado en tabla, creando perfil...");
+        console.warn("⚠️ Usuario no encontrado, creando perfil...");
         return await createUserProfile(email);
       }
 
-      console.log("✅ Perfil cargado:", data);
+      console.log("✅ Perfil cargado");
       return data;
     } catch (error) {
       console.error("❌ Error cargando perfil:", error);
@@ -140,7 +191,7 @@ function App() {
 
       if (error) throw error;
 
-      console.log("✅ Perfil creado:", data);
+      console.log("✅ Perfil creado");
       return data;
     } catch (error) {
       console.error("❌ Error creando perfil:", error);
@@ -159,24 +210,19 @@ function App() {
     }
   };
 
-  const handleLogin = async (email) => {
-    console.log("🚀 Login manual para:", email);
-    // La autenticación real se maneja en onAuthStateChange
+  const handleLogin = (email) => {
+    console.log("🚀 Login iniciado para:", email);
   };
 
-  const handleRegister = async (email) => {
-    console.log("🎉 Registro manual para:", email);
-    // La autenticación real se maneja en onAuthStateChange
+  const handleRegister = (email) => {
+    console.log("🎉 Registro iniciado para:", email);
   };
 
   const handleLogout = async () => {
     try {
       console.log("👋 Cerrando sesión...");
-
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      // El estado se actualizará automáticamente por onAuthStateChange
+      await supabase.auth.signOut();
+      // El estado se actualizará por onAuthStateChange
     } catch (error) {
       console.error("❌ Error cerrando sesión:", error);
     }
@@ -201,8 +247,8 @@ function App() {
     setCurrentView(view);
   };
 
-  // Loading component
-  if (loading) {
+  // Loading component mejorado
+  if (loading && !authChecked) {
     return (
       <div className="app-loading">
         <div className="loading-content">
@@ -214,6 +260,11 @@ function App() {
             <span></span>
             <span></span>
           </div>
+          <div className="loading-progress">
+            <div className="progress-bar">
+              <div className="progress-fill"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -221,7 +272,18 @@ function App() {
 
   const renderContent = () => {
     console.log("🎬 Renderizando vista:", currentView);
-    console.log("👤 Estado usuario:", user ? "Autenticado" : "No autenticado");
+    console.log("👤 Usuario:", user ? user.email : "No autenticado");
+
+    // Si ya verificamos auth pero no hay usuario, mostrar welcome
+    if (
+      authChecked &&
+      !user &&
+      currentView !== "welcome" &&
+      currentView !== "login" &&
+      currentView !== "register"
+    ) {
+      return <Welcome onStart={handleStart} />;
+    }
 
     switch (currentView) {
       case "welcome":
@@ -252,22 +314,30 @@ function App() {
         );
 
       case "dashboard":
-        return <Dashboard onNavigate={navigateTo} />;
+        return user ? (
+          <Dashboard onNavigate={navigateTo} />
+        ) : (
+          <Welcome onStart={handleStart} />
+        );
 
       case "powerbi":
-        return <PowerBIDashboard />;
+        return user ? <PowerBIDashboard /> : <Welcome onStart={handleStart} />;
 
       case "data":
-        return <DataTable />;
+        return user ? <DataTable /> : <Welcome onStart={handleStart} />;
 
       case "reciclaje":
-        return <ReciclajeInfo />;
+        return user ? <ReciclajeInfo /> : <Welcome onStart={handleStart} />;
 
       case "estacion":
-        return <EstacionClasificadora />;
+        return user ? (
+          <EstacionClasificadora />
+        ) : (
+          <Welcome onStart={handleStart} />
+        );
 
       case "admin":
-        return isAdmin() ? (
+        return user && isAdmin() ? (
           <AdminUsuarios />
         ) : (
           <div className="access-denied">
@@ -281,7 +351,6 @@ function App() {
         );
 
       default:
-        console.warn("⚠️ Vista no reconocida, redirigiendo a welcome");
         return <Welcome onStart={handleStart} />;
     }
   };
@@ -294,8 +363,8 @@ function App() {
           <span>Estación de Clasificación</span>
         </div>
 
-        {/* NAVEGACIÓN - Mostrar solo si hay usuario autenticado */}
-        {user && (
+        {/* NAVEGACIÓN - Mostrar solo si hay usuario autenticado y auth ya fue verificada */}
+        {user && authChecked && (
           <nav>
             <button
               className={currentView === "dashboard" ? "active" : ""}
@@ -328,7 +397,6 @@ function App() {
               <i className="fas fa-robot"></i> Estación
             </button>
 
-            {/* Botón de Admin - solo para administradores */}
             {isAdmin() && (
               <button
                 className={currentView === "admin" ? "active" : ""}
@@ -350,7 +418,7 @@ function App() {
       <footer>
         <p>
           Sistema de Monitoreo - Tesis 2024 |
-          {user
+          {user && authChecked
             ? ` Usuario: ${user.email} ${isAdmin() ? "(Admin)" : ""}`
             : " No autenticado"}
         </p>
