@@ -29,7 +29,7 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
     setError("");
 
     try {
-      console.log("🔄 Intentando login...");
+      console.log("🔄 Intentando login con:", formData.email);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email.trim().toLowerCase(),
@@ -38,23 +38,24 @@ const Login = ({ onLogin, onSwitchToRegister, onBackToWelcome }) => {
 
       if (error) {
         console.error("❌ Error de Supabase:", error);
-        throw error;
+
+        if (error.message.includes("Invalid login credentials")) {
+          throw new Error("Email o contraseña incorrectos");
+        } else {
+          throw error;
+        }
       }
 
       if (data.user) {
-        console.log("✅ Login exitoso para:", data.user.email);
-        onLogin(data.user.email);
+        console.log("✅ Login exitoso, redirigiendo...");
+        // onLogin se llamará automáticamente por onAuthStateChange
       }
     } catch (error) {
       console.error("💥 Error de login:", error);
-
-      if (error.message.includes("Invalid login credentials")) {
-        setError("Email o contraseña incorrectos");
-      } else if (error.message.includes("Email not confirmed")) {
-        setError("Por favor, confirma tu email antes de iniciar sesión");
-      } else {
-        setError("Error al iniciar sesión: " + error.message);
-      }
+      setError(
+        error.message ||
+          "Error al iniciar sesión. Por favor, intenta nuevamente."
+      );
     } finally {
       setLoading(false);
     }
